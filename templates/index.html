@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>N-Queens Web Solver</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body style="background: #181818; color: #eee; min-height: 100vh; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;">
+    <div class="container" style="max-width: 900px; margin: 0 auto; padding: 2em;">
+      <h1 style="text-align: center; font-size: 2.5em; font-weight: 700; margin-bottom: 1em; letter-spacing: 2px;">N-Queens Solver 3D</h1>
+      <div class="controls" style="display: flex; justify-content: center; gap: 1em; margin-bottom: 2em;">
+        <label for="n">N:</label>
+        <input id="n" type="number" value="8" min="1" max="20" style="width: 80px; padding: 0.3em; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;" />
+        <label for="timeout">Timeout (ms):</label>
+        <input id="timeout" type="number" value="60000" min="1000" style="width: 120px; padding: 0.3em; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;" />
+        <button id="solveBtn" style="padding: 0.4em 1.2em; border-radius: 6px; border: none; background: #e53935; color: #fff; font-weight: 600; cursor: pointer;">Risolvi</button>
+      </div>
+      <div id="status" class="status" style="text-align: center; margin-bottom: 1em;"></div>
+     
+      <div id="react-container" style="margin: 2em auto; width: 650px; height: 650px; border: 2px solid #444; border-radius: 12px; box-shadow: 0 2px 12px #0002; display: flex; align-items: center; justify-content: center; background: #222;">
+        <div id="viewer" style="width: 600px; height: 600px;"></div>
+      </div>
+    </div>
+    <script src="static/viewer.js"></script>
+  </body>
+</html>
