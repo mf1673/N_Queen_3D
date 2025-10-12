@@ -2,18 +2,21 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Queen3DViewer from './App.jsx';
 
-// 🔹 Qui scegli manualmente dimensione e regine per test
-const n = 4;
+// 🔹 Test manuale (puoi cambiare N e regine)
+const n = 5;
 const queenPositions = [
   [0, 0, 0],
   [1, 2, 3],
-  [2, 4, 1],
-  [3, 1, 6],
+  [3, 4, 1],
+  [4, 1, 2],
 ];
 
-// 🔹 React render nel div #viewer del tuo index.html Flask
+// 🔹 Monta React nel div #viewer (contenuto nel tuo index.html Flask)
 const container = document.getElementById('viewer');
 if (container) {
-  const root = ReactDOM.createRoot(container);
-  root.render(<Queen3DViewer n={n} queenPositions={queenPositions} />);
+  ReactDOM.createRoot(container).render(
+    <React.StrictMode>
+      <Queen3DViewer n={n} queenPositions={queenPositions} />
+    </React.StrictMode>
+  );
 }
