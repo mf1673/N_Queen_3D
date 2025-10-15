@@ -1,26 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>N-Queens Web Solver</title>
-    <link rel="stylesheet" href="/static/style.css" />
-  </head>
-  <body style="background: #181818; color: #eee; min-height: 100vh; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;">
-    <div class="container" style="max-width: 900px; margin: 0 auto; padding: 2em;">
-      <h1 style="text-align: center; font-size: 2.5em; font-weight: 700; margin-bottom: 1em; letter-spacing: 2px;">N-Queens Solver 3D</h1>
-      <div class="controls" style="display: flex; justify-content: center; gap: 1em; margin-bottom: 2em;">
-        <label for="n">N:</label>
-        <input id="n" type="number" value="8" min="1" max="20" style="width: 80px; padding: 0.3em; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;" />
-        <label for="timeout">Timeout (ms):</label>
-        <input id="timeout" type="number" value="60000" min="1000" style="width: 120px; padding: 0.3em; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;" />
-        <button id="solveBtn" style="padding: 0.4em 1.2em; border-radius: 6px; border: none; background: #e53935; color: #fff; font-weight: 600; cursor: pointer;">Risolvi</button>
-      </div>
-      <div id="status" class="status" style="text-align: center; margin-bottom: 1em;"></div>
-     
-      <div id="react-container" style="margin: 2em auto; width: 650px; height: 650px; border: 2px solid #444; border-radius: 12px; box-shadow: 0 2px 12px #0002; display: flex; align-items: center; justify-content: center; background: #222;">
-        <script src="static/viewer.js"></script>
-      </div>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>N-Queens Web Solver</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body
+  style="background: #181818; color: #eee; min-height: 100vh; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;">
+  <div class="container" style="max-width: 900px; margin: 0 auto; padding: 2em;">
+    <h1 style="text-align: center; font-size: 2.5em; font-weight: 700; margin-bottom: 1em; letter-spacing: 2px;">
+      N-Queens Solver 3D
+    </h1>
+    <!-- 🔹 Controlli -->
+    <div class="controls" style="display: flex; justify-content: center; gap: 1em; margin-bottom: 2em;">
+      <label for="n">N:</label>
+      <input id="n" type="number" value="8" min="1" max="20"
+        style="width: 80px; padding: 0.3em; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;" />
+      <label for="timeout">Timeout (ms):</label>
+      <input id="timeout" type="number" value="60000" min="1000"
+        style="width: 120px; padding: 0.3em; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;" />
+      <button id="solveBtn"
+        style="padding: 0.4em 1.2em; border-radius: 6px; border: none; background: #e53935; color: #fff; font-weight: 600; cursor: pointer;">
+        Risolvi
+      </button>
     </div>
-  </body>
+    <div id="status" class="status" style="text-align: center; margin-bottom: 1em;"></div>
+
+    <!-- 🔹 Contenitore React -->
+    <div id="react-container"
+      style="margin: 2em auto; width: 650px; height: 650px; border: 2px solid #444; border-radius: 12px; box-shadow: 0 2px 12px #0002; display: flex; align-items: center; justify-content: center; background: #222;">
+      <!-- React monterà qui il viewer -->
+      <div id="viewer" style="width: 600px; height: 600px;"></div>
+    </div>
+  </div>
+
+  <!-- 🔹 Script React compilato da Vite -->
+  <script src="/static/viewer.js"></script>
+
+  <!-- 🔹 Script per la richiesta a Flask -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('solveBtn');
+      const statusEl = document.getElementById('status');
+
+      btn.addEventListener('click', async () => {
+        const n = parseInt(document.getElementById('n').value, 10);
+        const timeout_ms = parseInt(document.getElementById('timeout').value, 10);
+
+        if (!Number.isInteger(n) || n <= 0) {
+          statusEl.textContent = "❌ Valore di N non valido.";
+          return;
+        }
+        if (!Number.isInteger(timeout_ms) || timeout_ms <= 0) {
+          statusEl.textContent = "❌ Valore di timeout non valido.";
+          return;
+        }
+
+        statusEl.textContent = "🧩 Risoluzione in corso...";
+        console.log("[DEBUG FRONTEND] Invio dati:", { n, timeout_ms });
+
+        try {
+          const res = await fetch("/solve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ n: n, timeout_ms: timeout_ms }) // <-- use timeout_ms (fixed)
+          });
+
+          const data = await res.json();
+          console.log("[DEBUG FRONTEND] Risposta Flask:", data);
+
+          if (data.error) {
+            statusEl.textContent = "❌ " + data.error;
+            return;
+          }
+
+          if (data.solution) {
+            statusEl.textContent = `✅ Soluzione trovata in ${data.time_sec?.toFixed(2) || '0.00'}s (${data.objective || 0} regine)`;
+
+            // Converti la matrice 3D in lista di coordinate [x,y,z]
+            const positions = [];
+            const sol = data.solution;
+            for (let x = 0; x < sol.length; x++) {
+              for (let y = 0; y < sol[x].length; y++) {
+                for (let z = 0; z < sol[x][y].length; z++) {
+                  if (sol[x][y][z] === 1) positions.push([x, y, z]);
+                }
+              }
+            }
+
+            // Mostra il risultato in 3D (window.renderQueens definita in viewer.js)
+            if (typeof window.renderQueens === 'function') {
+              window.renderQueens(n, positions);
+            } else {
+              console.warn("renderQueens non definita. Assicurati che /static/viewer.js sia caricato correttamente.");
+            }
+          } else {
+            statusEl.textContent = "❌ Nessuna soluzione trovata.";
+          }
+        } catch (err) {
+          console.error("[ERRORE FRONTEND] Errore nella richiesta:", err);
+          statusEl.textContent = "⚠️ Errore durante la richiesta.";
+        }
+      });
+    });
+  </script>
+
+</body>
+
 </html>

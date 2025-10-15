@@ -131,8 +131,5 @@ export default function Queen3DViewer({ n, queenPositions = [] }) {
     };
   }, [n, queenPositions]);
 
-  // 🔹 Inserisci questo componente in un <div id="viewer"></div> dell'HTML
-  //    e passagli le props con la dimensione N e le coordinate delle regine.
-
-  return <div ref={mountRef} style={"width: 575px; height: 575px;"} />;
+  return <div ref={mountRef} style={{width: '575px', height: '575px'}} />;
 }

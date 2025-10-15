@@ -5,12 +5,12 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: '../static',   // Flask servirà da questa cartella, salva il bundle in /static
-    emptyOutDir: true,
+    emptyOutDir: false,
     rollupOptions: {
       input: 'src/main.jsx',
       output: {
         entryFileNames: 'viewer.js',  // nome del bundle finale
-        name: 'Queen3DViewerApp'
+        assetFileNames: 'asset/[name][extname]'
       }
     }
   }

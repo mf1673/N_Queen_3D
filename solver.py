@@ -87,7 +87,6 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
             obj_val = sum(solution[x][y][z] for x in range(n)
                           for y in range(n) for z in range(n))
         elapsed = time.time() - start
-
         if queue:
             queue.put({
                 'status': 'sat',
@@ -98,45 +97,5 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
             })
     elif queue:
         queue.put({'status': str(result), 'fixed_pos': fixed_pos})
-
-
-def parallel_n_queens(n, timeout_ms):
-    num_procs = min(cpu_count(), 12)
-    #print(f"🔹 Avvio {num_procs} processi paralleli\n")
-
-    from multiprocessing import Manager
-    with Manager() as manager:
-        queue = manager.Queue()
-        procs = []
-
-        positions = [(0, i % n, (i * 3) % n) for i in range(num_procs)]
-
-        for pos in positions:
-            p = Process(target=solve_n_queens, args=(n, timeout_ms, pos, queue))
-            p.start()
-            procs.append(p)
-
-        # Aspetta il primo risultato
-        result = queue.get()
-        #print(f"\n🧩 Primo risultato da processo con pos {result.get('fixed_pos')}: {result['status']}")
-
-        # Termina gli altri
-        for p in procs:
-            p.terminate()
-
-        if result['status'] == 'sat':
-            sol = result['solution']
-            print(f"\n=== Soluzione trovata per N={n} ===")
-            for x in range(n):
-                print(f"\nLayer X={x}:")
-                for y in range(n):
-                    print(' '.join(str(sol[x][y][z]) for z in range(n)))
-            print(f"\nValore obiettivo: {result['objective']}")
-            print(f"Tempo impiegato: {result['time_sec']:.2f} sec\n")
-
-            
-            # alla fine di parallel_n_queens:
-            with open("solution.json", "w") as f:
-                json.dump(result, f)
 
 
