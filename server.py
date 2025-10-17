@@ -22,12 +22,12 @@ def solve_route():
 
     timeout_ms = data.get('timeout_ms', 60000)
 
-    # Crea la coda per ricevere il risultato dal solver
+    # Create the queue to receive results from solver
     q = Queue()
     start_time = time.time()
     solve_n_queens(n, timeout_ms, queue=q)
 
-    # Attendi risultato
+    # wait results
     try:
         result = q.get(timeout=timeout_ms / 1000)
     except Exception as e:
@@ -35,7 +35,7 @@ def solve_route():
 
     elapsed = time.time() - start_time
 
-    # Controlla che la chiave 'solution' esista
+    # Check if 'solution' key exists 
     if isinstance(result, dict) and 'solution' in result:
         return jsonify({
             'status': 'sat',

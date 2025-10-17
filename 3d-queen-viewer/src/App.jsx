@@ -9,7 +9,7 @@ export default function Queen3DViewer({ n, queenPositions = [] }) {
     const mount = mountRef.current;
     if (!mount) return;
 
-    // --- Crea scena, camera e renderer
+    // --- Create scene, camera and renderer
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0b0b0b);
 
@@ -24,7 +24,7 @@ export default function Queen3DViewer({ n, queenPositions = [] }) {
     renderer.setPixelRatio(window.devicePixelRatio || 1);
     mount.appendChild(renderer.domElement);
 
-    // --- Luci di scena
+    // --- Scene lights
     const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.9);
     hemi.position.set(0, n * 2, 0);
     scene.add(hemi);
@@ -32,17 +32,17 @@ export default function Queen3DViewer({ n, queenPositions = [] }) {
     dir.position.set(n, n * 2, n);
     scene.add(dir);
 
-    // --- Controlli orbit per ruotare la visuale
+    // --- Orbit controls for rotating the view
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.rotateSpeed = 0.6;
 
-    // --- Gruppo principale per gli oggetti
+    // --- Objects main gruop
     const group = new THREE.Group();
     scene.add(group);
 
-    // --- Crea la griglia 3D semitrasparente
+    // --- Create the semitransparent 3D grid
     const cellSize = 0.9;
     const gridMat = new THREE.MeshStandardMaterial({
       color: 0x999999,
@@ -74,17 +74,17 @@ export default function Queen3DViewer({ n, queenPositions = [] }) {
     }
     group.add(gridInstanced);
 
-    // --- Contorno del cubo principale
+    // --- Outline of the main cube
     const bbox = new THREE.BoxGeometry(n, n, n);
     const edges = new THREE.EdgesGeometry(bbox);
     const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x666666 }));
     group.add(line);
 
-    // --- Crea le regine rosse
+    // --- Create red queens
     const queenGeo = new THREE.BoxGeometry(cellSize * 0.9, cellSize * 0.9, cellSize * 0.9);
     const queenMat = new THREE.MeshStandardMaterial({ color: 0xff3333, metalness: 0.2, roughness: 0.4 });
 
-    // 🔹 Qui vengono posizionate le regine secondo il risultato del solver
+    // --- Here the queens are placed according to the solver result
     const queenInstanced = new THREE.InstancedMesh(queenGeo, queenMat, queenPositions.length);
     const tmpMat = new THREE.Matrix4();
 
@@ -98,7 +98,7 @@ export default function Queen3DViewer({ n, queenPositions = [] }) {
 
     group.add(queenInstanced);
 
-    // --- Gestione del resize finestra
+    // --- Window resize management
     const onResize = () => {
       const w = mount.clientWidth;
       const h = mount.clientHeight;
@@ -108,7 +108,7 @@ export default function Queen3DViewer({ n, queenPositions = [] }) {
     };
     window.addEventListener('resize', onResize);
 
-    // --- Animazione loop
+    // --- Loop animation
     let rafId;
     const animate = () => {
       controls.update();

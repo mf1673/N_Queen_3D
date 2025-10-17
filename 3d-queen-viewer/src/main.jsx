@@ -7,7 +7,7 @@ window.renderQueens = (n, queenPositions) => {
 
   const container = document.getElementById('viewer');
   if (container) {
-    // Pulizia: resetta il contenuto precedente prima di re-renderizzare
+    // Cleaning: reset the content before ri-render 
     container.innerHTML = '';
     const root = ReactDOM.createRoot(container);
     root.render(
@@ -16,6 +16,6 @@ window.renderQueens = (n, queenPositions) => {
       </React.StrictMode>
     );
   } else {
-    console.error("[ERRORE] Elemento #viewer non trovato in index.html");
+    console.error("[ERROR] #viewer Element not found in index.html");
   }
 };

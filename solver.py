@@ -1,22 +1,21 @@
 from z3 import *
-from multiprocessing import Process, Queue, cpu_count
+from multiprocessing import Queue
 import json 
 import time
 import os
 
-def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
-    # --- Creazione optimizer
+def solve_n_queens(n, timeout_ms,queue=None):
+    # --- Create optimizer
     opt = Optimize()
 
-    # --- Variabili booleane: Q[x][y][z] = True se c’è una regina in (x,y,z)
+    # --- Boolean Matrix: Q[x][y][z] = True there is a queen in (x,y,z)
     Q = [[[Bool(f"Q_{x}_{y}_{z}") for z in range(n)] for y in range(n)] for x in range(n)]
 
     # ============================
-    #           Vincoli
+    #         Costraints
     # ============================  
-
     
-    # Al Max una per Asse XYZ
+    # XYZ 
     [opt.add(AtMost(*[Q[x][y][z] for x in range(n)], 1)) for y in range(n) for z in range(n)]
     [opt.add(AtMost(*[Q[x][y][z] for y in range(n)], 1)) for x in range(n) for z in range(n)]
     [opt.add(AtMost(*[Q[x][y][z] for z in range(n)], 1)) for x in range(n) for y in range(n)]
@@ -41,33 +40,28 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
         for x in range(n) for s in range(2*n - 1)])
     
   
-
-    # direzioni indipendenti (4): (1,1,1), (1,1,-1), (1,-1,1), (1,-1,-1)
+    # Indipendent directons (4): (1,1,1), (1,1,-1), (1,-1,1), (1,-1,-1)
     dirs = [(1,1,1),(1,1,-1),(1,-1,1),(1,-1,-1)]
-
     for x in range(n):
         for y in range(n):
             for z in range(n):
                 for dx,dy,dz in dirs:
-                    # costruisco la lista delle celle successive lungo il raggio positivo
+                    # make the list of subsequent cells along the positive radius
                     targets_pos = [(x + t*dx, y + t*dy, z + t*dz) for t in range(1, n) 
                                 if 0 <= x + t*dx < n and 0 <= y + t*dy < n and 0 <= z + t*dz < n]
                     if targets_pos:
                         opt.add(Implies(Q[x][y][z], And([Not(Q[xx][yy][zz]) for (xx,yy,zz) in targets_pos])))
-                    # costruisco la lista delle celle lungo il raggio opposto (per sicurezza esplicita)
+                    # make the list of cells along the opposite radius (for explicit safety)
                     targets_neg = [(x - t*dx, y - t*dy, z - t*dz) for t in range(1, n) 
                                 if 0 <= x - t*dx < n and 0 <= y - t*dy < n and 0 <= z - t*dz < n]
                     if targets_neg:
                         opt.add(Implies(Q[x][y][z], And([Not(Q[xx][yy][zz]) for (xx,yy,zz) in targets_neg])))
 
 
-
-
     # ====================================
     #              Obiettivo
     # ====================================
     start = time.time()
-
 
     try:
         opt.set('timeout', int(timeout_ms))
@@ -84,7 +78,7 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
         m = opt.model()
         solution = [[[1 if m.evaluate(Q[x][y][z]) else 0 for z in range(n)]
                      for y in range(n)] for x in range(n)]
-        #print(f"\n=== Soluzione trovata per N={n} ===")
+        #print(f"\n=== Solution found for N={n} ===")
         #for x in range(n):
         #    print(f"\nLayer X={x}:")
         #    for y in range(n):
@@ -101,7 +95,6 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
                 'solution': solution,
                 'objective': int(obj_val),
                 'time_sec': elapsed,
-                'fixed_pos': fixed_pos
             })
     elif queue:
         queue.put({'status': str(result), 'fixed_pos': fixed_pos})
