@@ -14,11 +14,13 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
     # ============================
     #           Vincoli
     # ============================  
+
+    
     # Al Max una per Asse XYZ
     [opt.add(AtMost(*[Q[x][y][z] for x in range(n)], 1)) for y in range(n) for z in range(n)]
     [opt.add(AtMost(*[Q[x][y][z] for y in range(n)], 1)) for x in range(n) for z in range(n)]
     [opt.add(AtMost(*[Q[x][y][z] for z in range(n)], 1)) for x in range(n) for y in range(n)]
-
+    
     # YX -YX
     opt.add(
         [AtMost(*[Q[x][y][z] for x in range(n) for y in range(n) if x - y == d], 1)
@@ -39,32 +41,51 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
         for x in range(n) for s in range(2*n - 1)])
     
 
-    # XYZ   -X-Y-Z
-    opt.add([AtMost(*[Q[x][y][z]for x in range(n)for y in range(n)for z in range(n)if x+y+z==d], 1)for d in range(0, 3*n - 3)])
-    
+    '''  
+    # XYZ -X-Y-Z
+    opt.add([AtMost(*[Q[x][y][z] for x in range(n) for y in range(n) for z in range(n) if x+y+z==d], 1) for d in range(0, 3*(n-1)+1)])
+
+
+      
     # X-YZ  -XYZ
-    opt.add([AtMost(*[Q[x][y][z]for x in range(n)for y in range(n)for z in range(n)if x-y+z==d], 1)for d in range(-(n-1), 2*n - 2)])
+    opt.add([AtMost(*[Q[x][y][z]for x in range(n)for y in range(n)for z in range(n)if x-y+z==d], 1)for d in range(-(n - 1), 2*n - 2)])
     
     # XY-Z  -X-YZ
     opt.add([AtMost(*[Q[x][y][z]for x in range(n)for y in range(n)for z in range(n)if x+y-z==d], 1)for d in range(-(n - 1), 2 * n - 1)])
 
     # -XYZ  X-Y-Z
     opt.add([AtMost(*[Q[x][y][z]for x in range(n)for y in range(n)for z in range(n)if y-x+z==d], 1)for d in range(-(n - 1), 2 * n - 1)])
+    
+    '''
+
+    
+
+    # direzioni indipendenti (4): (1,1,1), (1,1,-1), (1,-1,1), (1,-1,-1)
+    dirs = [(1,1,1),(1,1,-1),(1,-1,1),(1,-1,-1)]
+
+    for x in range(n):
+        for y in range(n):
+            for z in range(n):
+                for dx,dy,dz in dirs:
+                    # costruisco la lista delle celle successive lungo il raggio positivo
+                    targets_pos = [(x + t*dx, y + t*dy, z + t*dz) for t in range(1, n) 
+                                if 0 <= x + t*dx < n and 0 <= y + t*dy < n and 0 <= z + t*dz < n]
+                    if targets_pos:
+                        opt.add(Implies(Q[x][y][z], And([Not(Q[xx][yy][zz]) for (xx,yy,zz) in targets_pos])))
+                    # costruisco la lista delle celle lungo il raggio opposto (per sicurezza esplicita)
+                    targets_neg = [(x - t*dx, y - t*dy, z - t*dz) for t in range(1, n) 
+                                if 0 <= x - t*dx < n and 0 <= y - t*dy < n and 0 <= z - t*dz < n]
+                    if targets_neg:
+                        opt.add(Implies(Q[x][y][z], And([Not(Q[xx][yy][zz]) for (xx,yy,zz) in targets_neg])))
 
 
 
-    # =====================================
-    #     Vincolo specifico del processo
-    # =====================================
-    # serve a differenziare la ricerca
-    if fixed_pos:
-        x0, y0, z0 = fixed_pos
-        opt.add(Q[x0][y0][z0])
 
     # ====================================
     #              Obiettivo
     # ====================================
     start = time.time()
+
 
     try:
         opt.set('timeout', int(timeout_ms))
@@ -81,6 +102,11 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
         m = opt.model()
         solution = [[[1 if m.evaluate(Q[x][y][z]) else 0 for z in range(n)]
                      for y in range(n)] for x in range(n)]
+        #print(f"\n=== Soluzione trovata per N={n} ===")
+        #for x in range(n):
+        #    print(f"\nLayer X={x}:")
+        #    for y in range(n):
+        #        print(' '.join(str(solution[x][y][z]) for z in range(n)))
         try:
             obj_val = m.evaluate(objective).as_long()
         except Exception:
@@ -99,3 +125,5 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
         queue.put({'status': str(result), 'fixed_pos': fixed_pos})
 
 
+if __name__ == "__main__":
+    solve_n_queens(2,10000)
