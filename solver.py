@@ -40,25 +40,7 @@ def solve_n_queens(n, timeout_ms, fixed_pos=None, queue=None):
         [AtMost(*[Q[x][y][z] for y in range(n) for z in range(n) if y + z == s], 1)
         for x in range(n) for s in range(2*n - 1)])
     
-
-    '''  
-    # XYZ -X-Y-Z
-    opt.add([AtMost(*[Q[x][y][z] for x in range(n) for y in range(n) for z in range(n) if x+y+z==d], 1) for d in range(0, 3*(n-1)+1)])
-
-
-      
-    # X-YZ  -XYZ
-    opt.add([AtMost(*[Q[x][y][z]for x in range(n)for y in range(n)for z in range(n)if x-y+z==d], 1)for d in range(-(n - 1), 2*n - 2)])
-    
-    # XY-Z  -X-YZ
-    opt.add([AtMost(*[Q[x][y][z]for x in range(n)for y in range(n)for z in range(n)if x+y-z==d], 1)for d in range(-(n - 1), 2 * n - 1)])
-
-    # -XYZ  X-Y-Z
-    opt.add([AtMost(*[Q[x][y][z]for x in range(n)for y in range(n)for z in range(n)if y-x+z==d], 1)for d in range(-(n - 1), 2 * n - 1)])
-    
-    '''
-
-    
+  
 
     # direzioni indipendenti (4): (1,1,1), (1,1,-1), (1,-1,1), (1,-1,-1)
     dirs = [(1,1,1),(1,1,-1),(1,-1,1),(1,-1,-1)]

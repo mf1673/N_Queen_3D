@@ -14,13 +14,13 @@
     <h1 style="text-align: center; font-size: 2.5em; font-weight: 700; margin-bottom: 1em; letter-spacing: 2px;">
       N-Queens Solver 3D
     </h1>
-    <!-- 🔹 Controlli -->
+    <!-- Controls -->
     <div class="controls" style="display: flex; justify-content: center; gap: 1em; margin-bottom: 2em;">
       <label for="n">N:</label>
-      <input id="n" type="number" value="8" min="1" max="20"
+      <input id="n" type="number" value="6" min="1" max="20"
         style="width: 80px; padding: 0.3em; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;" />
       <label for="timeout">Timeout (ms):</label>
-      <input id="timeout" type="number" value="120000" min="1000"
+      <input id="timeout" type="number" value="10000" min="1000"
         style="width: 120px; padding: 0.3em; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;" />
       <button id="solveBtn"
         style="padding: 0.4em 1.2em; border-radius: 6px; border: none; background: #e53935; color: #fff; font-weight: 600; cursor: pointer;">
@@ -29,18 +29,18 @@
     </div>
     <div id="status" class="status" style="text-align: center; margin-bottom: 1em;"></div>
 
-    <!-- 🔹 Contenitore React -->
+    <!-- React Container -->
     <div id="react-container"
       style="margin: 2em auto; width: 650px; height: 650px; border: 2px solid #444; border-radius: 12px; box-shadow: 0 2px 12px #0002; display: flex; align-items: center; justify-content: center; background: #222;">
-      <!-- React monterà qui il viewer -->
+      <!-- React will mount here viewer.js -->
       <div id="viewer" style="width: 600px; height: 600px;"></div>
     </div>
   </div>
 
-  <!-- 🔹 Script React compilato da Vite -->
+  <!-- Vite's compiled React script -->
   <script src="/static/viewer.js"></script>
 
-  <!-- 🔹 Script per la richiesta a Flask -->
+  <!-- Flask's request script -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const btn = document.getElementById('solveBtn');
@@ -51,15 +51,15 @@
         const timeout_ms = parseInt(document.getElementById('timeout').value, 10);
 
         if (!Number.isInteger(n) || n <= 0) {
-          statusEl.textContent = "❌ Valore di N non valido.";
+          statusEl.textContent = "❌ N value not valid.";
           return;
         }
         if (!Number.isInteger(timeout_ms) || timeout_ms <= 0) {
-          statusEl.textContent = "❌ Valore di timeout non valido.";
+          statusEl.textContent = "❌ Timeout value not valid.";
           return;
         }
 
-        statusEl.textContent = "🧩 Risoluzione in corso...";
+        statusEl.textContent = "🧩 Resolving  ...";
         console.log("[DEBUG FRONTEND] Invio dati:", { n, timeout_ms });
 
         try {
@@ -78,9 +78,9 @@
           }
 
           if (data.solution) {
-            statusEl.textContent = `✅ Soluzione trovata in ${data.time_sec?.toFixed(2) || '0.00'}s (${data.objective || 0} regine)`;
+            statusEl.textContent = `✅ Solution found in ${data.time_sec?.toFixed(2) || '0.00'}s (${data.objective || 0} queens)`;
 
-            // Converti la matrice 3D in lista di coordinate [x,y,z]
+            // Convert 3D matrix in coordinate list [x,y,z]
             const positions = [];
             const sol = data.solution;
             for (let x = 0; x < sol.length; x++) {
@@ -90,19 +90,19 @@
                 }
               }
             }
-
-            // Mostra il risultato in 3D (window.renderQueens definita in viewer.js)
+ 
+            // Show result in 3D (window.renderQueens defined in viewer.js)
             if (typeof window.renderQueens === 'function') {
               window.renderQueens(n, positions);
             } else {
-              console.warn("renderQueens non definita. Assicurati che /static/viewer.js sia caricato correttamente.");
+              console.warn("renderQueens not defined. Make sure that /static/viewer.js is loaded correctly.");
             }
           } else {
-            statusEl.textContent = "❌ Nessuna soluzione trovata.";
+            statusEl.textContent = "❌ None solution found.";
           }
         } catch (err) {
-          console.error("[ERRORE FRONTEND] Errore nella richiesta:", err);
-          statusEl.textContent = "⚠️ Errore durante la richiesta.";
+          console.error("[Frontend Error] Request error:", err);
+          statusEl.textContent = "⚠️ Error during request.";
         }
       });
     });
