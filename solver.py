@@ -11,10 +11,8 @@ def solve_n_queens(n, timeout_ms,queue=None):
     # --- Boolean Matrix: Q[x][y][z] = True there is a queen in (x,y,z)
     Q = [[[Bool(f"Q_{x}_{y}_{z}") for z in range(n)] for y in range(n)] for x in range(n)]
 
-    # ============================
-    #         Costraints
-    # ============================  
-    
+    # ------| Costraints |------
+        
     # XYZ 
     [opt.add(AtMost(*[Q[x][y][z] for x in range(n)], 1)) for y in range(n) for z in range(n)]
     [opt.add(AtMost(*[Q[x][y][z] for y in range(n)], 1)) for x in range(n) for z in range(n)]
@@ -39,7 +37,7 @@ def solve_n_queens(n, timeout_ms,queue=None):
         [AtMost(*[Q[x][y][z] for y in range(n) for z in range(n) if y + z == s], 1)
         for x in range(n) for s in range(2*n - 1)])
     
-  
+    
     # Indipendent directons (4): (1,1,1), (1,1,-1), (1,-1,1), (1,-1,-1)
     dirs = [(1,1,1),(1,1,-1),(1,-1,1),(1,-1,-1)]
     for x in range(n):
@@ -57,12 +55,10 @@ def solve_n_queens(n, timeout_ms,queue=None):
                     if targets_neg:
                         opt.add(Implies(Q[x][y][z], And([Not(Q[xx][yy][zz]) for (xx,yy,zz) in targets_neg])))
 
-
-    # ====================================
-    #              Obiettivo
-    # ====================================
+    # ------ Objective ------
+    
     start = time.time()
-
+    
     try:
         opt.set('timeout', int(timeout_ms))
     except Exception:
@@ -77,12 +73,7 @@ def solve_n_queens(n, timeout_ms,queue=None):
     if result == sat:
         m = opt.model()
         solution = [[[1 if m.evaluate(Q[x][y][z]) else 0 for z in range(n)]
-                     for y in range(n)] for x in range(n)]
-        #print(f"\n=== Solution found for N={n} ===")
-        #for x in range(n):
-        #    print(f"\nLayer X={x}:")
-        #    for y in range(n):
-        #        print(' '.join(str(solution[x][y][z]) for z in range(n)))
+             for y in range(n)] for x in range(n)]
         try:
             obj_val = m.evaluate(objective).as_long()
         except Exception:

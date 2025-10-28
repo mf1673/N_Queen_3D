@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/ReadMe-✔️-018EF5?logo=readme&logoColor=fff">
   <img src="https://img.shields.io/badge/maintained-no-red">
   <img src="https://img.shields.io/badge/made%20for-UniTs-lightblue">
-  <img src="https://img.shields.io/badge/status-archived-lightgrey"><br>
+  <img src="https://img.shields.io/badge/status-archived-lightgrey"><br><br>
   <img src="https://img.shields.io/badge/Flask-000?logo=flask&logoColor=fff">
   <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff">
   <img src="https://img.shields.io/badge/HTML-%23E34F26.svg?logo=html5&logoColor=white">

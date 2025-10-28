@@ -51,15 +51,15 @@
         const timeout_ms = parseInt(document.getElementById('timeout').value, 10);
 
         if (!Number.isInteger(n) || n <= 0) {
-          statusEl.textContent = "❌ N value not valid.";
+          statusEl.textContent = " N value not valid.";
           return;
         }
         if (!Number.isInteger(timeout_ms) || timeout_ms <= 0) {
-          statusEl.textContent = "❌ Timeout value not valid.";
+          statusEl.textContent = "Timeout value not valid.";
           return;
         }
 
-        statusEl.textContent = "🧩 Resolving  ...";
+        statusEl.textContent = "Resolving  ...";
         console.log("[DEBUG FRONTEND] Invio dati:", { n, timeout_ms });
 
         try {
@@ -73,12 +73,12 @@
           console.log("[DEBUG FRONTEND] Risposta Flask:", data);
 
           if (data.error) {
-            statusEl.textContent = "❌ " + data.error;
+            statusEl.textContent =  data.error;
             return;
           }
 
           if (data.solution) {
-            statusEl.textContent = `✅ Solution found in ${data.time_sec?.toFixed(2) || '0.00'}s (${data.objective || 0} queens)`;
+            statusEl.textContent = `Solution found in ${data.time_sec?.toFixed(2) || '0.00'}s (${data.objective || 0} queens)`;
 
             // Convert 3D matrix in coordinate list [x,y,z]
             const positions = [];
@@ -98,11 +98,11 @@
               console.warn("renderQueens not defined. Make sure that /static/viewer.js is loaded correctly.");
             }
           } else {
-            statusEl.textContent = "❌ None solution found.";
+            statusEl.textContent = "None solution found.";
           }
         } catch (err) {
           console.error("[Frontend Error] Request error:", err);
-          statusEl.textContent = "⚠️ Error during request.";
+          statusEl.textContent = "Error during request.";
         }
       });
     });

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import Queen3DViewer from './App.jsx';
 
 window.renderQueens = (n, queenPositions) => {
-  console.log("[DEBUG] Rendering scena 3D con n =", n, "posizioni =", queenPositions);
+  console.log("[DEBUG] 3D scene rendering with n =", n, "positions =", queenPositions);
 
   const container = document.getElementById('viewer');
   if (container) {
